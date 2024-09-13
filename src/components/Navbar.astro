@@ -1,0 +1,32 @@
+---
+import Image from 'astro/components/Image.astro'
+import Logo from './assets/pawlygon logo.png'
+import { buttonVariants } from './ui/button'
+import { ModeToggle } from '@/components/ui/ModeToggle'
+
+const links = ['Products', 'About', 'Contact']
+---
+
+<header>
+	<nav class="bg-backgroundBlurred bright fixed top-0 z-20 w-full border-b-2 backdrop-blur-md">
+		<div class="mb-2 mt-4 flex items-baseline justify-center">
+			<Image src={Logo} alt={'Pawlygon logo'} class="size-16" />
+			<h1 class="select-none font-['Coolveltica'] text-5xl font-semibold">Pawlygon</h1>
+		</div>
+		<div class="flex items-center justify-between">
+			<div class="w-10"></div>
+			<div>
+				<a href="" class={buttonVariants({ variant: 'link' })}>Home</a>
+				<!-- Create buttons from 'links' array -->
+				{
+					links.map((link) => (
+						<a href={link} class={buttonVariants({ variant: 'link' })}>
+							{link}
+						</a>
+					))
+				}
+			</div>
+			<ModeToggle client:load />
+		</div>
+	</nav>
+</header>

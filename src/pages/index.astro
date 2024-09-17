@@ -6,6 +6,21 @@ import Layout from '../layouts/Layout.astro'
 
 <Layout title="Welcome to Pawlygon.">
 	<main>
+		<div
+			class="place-ontent-center relative m-2 max-h-screen min-h-48 overflow-hidden rounded-2xl md:m-8 md:aspect-video"
+		>
+			<video muted autoplay class="absolute w-full object-fill" src="/test.mp4"> </video>
+			<div
+				class="h-full w-full backdrop-blur-md backdrop-brightness-150 backdrop-saturate-50 dark:backdrop-brightness-50"
+			>
+				<h1 class="text-center align-middle text-4xl font-bold xl:text-8xl">
+					Welcome to Pawlygon!
+				</h1>
+				<p class="text-center align-middle text-2xl font-bold xl:text-6xl">
+					Where your dreams come true
+				</p>
+			</div>
+		</div>
 		<p>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a velit at neque viverra
 			faucibus. Donec non malesuada massa. Pellentesque nec risus non purus eleifend commodo vitae

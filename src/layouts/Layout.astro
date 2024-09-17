@@ -1,5 +1,5 @@
 ---
-import Navbar from '@/components/Navbar.astro'
+import { NavBar } from '@/components/Navbar'
 interface Props {
 	title: string
 }
@@ -38,8 +38,10 @@ const { title } = Astro.props
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body>
-		<Navbar />
+	<body class="pt-36">
+		<header>
+			<NavBar client:load />
+		</header>
 		<slot />
 	</body>
 </html>

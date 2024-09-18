@@ -62,7 +62,7 @@
 
 @font-face {
 	font-family: 'Coolveltica';
-	src: url('./fonts/coolvetica_condensed_rg-webfont.woff') format('woff');
+	src: url('/fonts/coolvetica_condensed_rg-webfont.woff') format('woff');
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;
@@ -70,7 +70,7 @@
 
 @font-face {
 	font-family: 'Bahnschrift';
-	src: url('./fonts/bahnschrift-webfont.woff') format('woff');
+	src: url('/fonts/bahnschrift-webfont.woff') format('woff');
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;

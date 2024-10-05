@@ -27,7 +27,7 @@ export function Footer() {
 		},
 		{
 			name: 'BiliBili',
-			link: 'https://space.bilibili.com/3546767433927187?spm_id_from=333.1007.0.0',
+			link: 'https://space.bilibili.com/3546767433927187',
 			icon: icons.bilibili
 		}
 	]

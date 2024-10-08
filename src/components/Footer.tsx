@@ -32,21 +32,26 @@ export function Footer() {
 	];
 
 	return (
-		<div className="flex h-14 w-full place-items-stretch justify-center border-t-2 bg-backgroundBlurred align-middle backdrop-blur-lg backdrop-saturate-50 md:justify-end">
-			{socials.map((social) => (
-				<Link
-					key={social.name}
-					href={social.link}
-					// @ts-expect-error socialName is a custom HTML parameter
-					socialName={social.name}
-					className={
-						buttonVariants({ variant: "link" }) +
-						" md:before:content- my-auto fill-foreground md:before:mr-2 md:before:content-[attr(socialName)]"
-					}
-				>
-					{social.icon}
-				</Link>
-			))}
+		<div className="flex h-14 w-full place-items-stretch justify-center border-t-2 bg-backgroundBlurred align-middle backdrop-blur-lg backdrop-saturate-50 md:justify-between">
+			<p className="my-auto fill-foreground pl-8 hidden md:inline">
+				©{new Date().getFullYear()} - Pawlygon Studio
+			</p>
+			<div>
+				{socials.map((social) => (
+					<Link
+						key={social.name}
+						href={social.link}
+						// @ts-expect-error socialName is a custom HTML parameter
+						socialname={social.name}
+						className={
+							buttonVariants({ variant: "link" }) +
+							" my-auto fill-foreground md:before:mr-2 md:before:content-[attr(socialname)]"
+						}
+					>
+						{social.icon}
+					</Link>
+				))}
+			</div>
 		</div>
 	);
 }

@@ -38,13 +38,16 @@ const commissionSchema = z.object({
 		.max(2000, {
 			message: "Please keep your description to a maximum of 2.000 characters.",
 		}),
-	files: z
-		.instanceof(FileList)
-		.refine((file) => file?.[0]?.size <= maxFileSize * 1024 * 1024, {
-			message: "Max file size is " + maxFileSize.toString() + "mb.",
-		})
-		.refine((file) => acceptedFileTypes.includes(file?.[0]?.type))
-		.optional(),
+	files:
+		typeof window === "undefined"
+			? z.any()
+			: z
+					.instanceof(FileList)
+					.refine((file) => file?.[0]?.size <= maxFileSize * 1024 * 1024, {
+						message: "Max file size is " + maxFileSize.toString() + "mb.",
+					})
+					.refine((file) => acceptedFileTypes.includes(file?.[0]?.type))
+					.optional(),
 });
 
 // @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.

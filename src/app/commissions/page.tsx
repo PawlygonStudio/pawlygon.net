@@ -1,103 +1,155 @@
-import Image from "next/image";
+"use client";
+
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+	Form,
+	FormControl,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import useSWR from "swr";
+
+// Form parameters.
+const maxFileSize = 5; //file size in mb
+const acceptedFileTypes = [
+	"image/jpeg",
+	"image/jpg",
+	"image/png",
+	"image/webp",
+];
+
+const commissionSchema = z.object({
+	discordID: z
+		.string()
+		.min(3, { message: "Username should be at least 3 characters." }),
+	email: z.string().email({ message: "Please enter a valid e-mail adress." }),
+	avatarName: z.string().optional(),
+	description: z
+		.string()
+		.min(20, { message: "Please write a description of what you want." })
+		.max(2000, {
+			message: "Please keep your description to a maximum of 2.000 characters.",
+		}),
+	files: z
+		.instanceof(FileList)
+		.refine((file) => file?.[0]?.size <= maxFileSize * 1024 * 1024, {
+			message: "Max file size is " + maxFileSize.toString() + "mb.",
+		})
+		.refine((file) => acceptedFileTypes.includes(file?.[0]?.type))
+		.optional(),
+});
+
+// @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
-	return (
-		<div
-			className={`grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-		>
-			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-				<Image
-					className="dark:invert"
-					src="https://nextjs.org/icons/next.svg"
-					alt="Next.js logo"
-					width={180}
-					height={38}
-					priority
-				/>
-				<ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-					<li className="mb-2">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-							src/pages/index.tsx
-						</code>
-						.
-					</li>
-					<li>Save and see your changes instantly.</li>
-				</ol>
+	const form = useForm<z.infer<typeof commissionSchema>>({
+		resolver: zodResolver(commissionSchema),
+		defaultValues: {
+			discordID: "",
+			email: "",
+			avatarName: "",
+			description: "",
+		},
+	});
 
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-						href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Image
-							className="dark:invert"
-							src="https://nextjs.org/icons/vercel.svg"
-							alt="Vercel logomark"
-							width={20}
-							height={20}
-						/>
-						Deploy now
-					</a>
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
-				</div>
-			</main>
-			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/file.svg"
-						alt="File icon"
-						width={16}
-						height={16}
+	const fileRef = form.register("files");
+
+	function onSubmit(values: z.infer<typeof commissionSchema>) {
+		console.log(values);
+	}
+
+	const { data } = useSWR("https://api.pawlygon.net/commissions", fetcher);
+	console.log(data);
+
+	return (
+		<>
+			<code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+				{JSON.stringify(data)}
+			</code>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+					<FormField
+						control={form.control}
+						name="discordID"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Discord Username</FormLabel>
+								<FormControl>
+									<Input {...field} placeholder="Pawly" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/window.svg"
-						alt="Window icon"
-						width={16}
-						height={16}
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input {...field} placeholder="Pawly" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					Examples
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/globe.svg"
-						alt="Globe icon"
-						width={16}
-						height={16}
+					<FormField
+						control={form.control}
+						name="avatarName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Avatar Name</FormLabel>
+								<FormControl>
+									<Input {...field} placeholder="Pawly" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					Go to nextjs.org →
-				</a>
-			</footer>
-		</div>
+					<FormField
+						control={form.control}
+						name="description"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>description</FormLabel>
+								<FormControl>
+									<Input {...field} placeholder="Pawly" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="files"
+						render={() => (
+							<FormItem>
+								<FormLabel>Image references</FormLabel>
+								<FormControl>
+									<Input
+										{...fileRef}
+										type="file"
+										multiple
+										accept={acceptedFileTypes.toString()}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button type="submit">Submit</Button>
+				</form>
+			</Form>
+		</>
 	);
 }

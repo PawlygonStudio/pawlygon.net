@@ -80,7 +80,7 @@ export function NavBar() {
 							<Link
 								key={link}
 								href={link}
-								className={buttonVariants({ variant: "link" })}
+								className={buttonVariants({ variant: "link" }) + " capitalize"}
 							>
 								{link}
 							</Link>

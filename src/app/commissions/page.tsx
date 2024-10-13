@@ -53,6 +53,14 @@ const commissionSchema = z.object({
 // @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
+const toBase64 = (file: File): Promise<string> =>
+	new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => resolve(reader.result as string);
+		reader.onerror = (error) => reject(error);
+	});
+
 export default function Home() {
 	const form = useForm<z.infer<typeof commissionSchema>>({
 		resolver: zodResolver(commissionSchema),
@@ -66,12 +74,41 @@ export default function Home() {
 
 	const fileRef = form.register("files");
 
-	function onSubmit(values: z.infer<typeof commissionSchema>) {
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof commissionSchema>) {
+		const uploads: unknown[] = [];
+		if (values.files) {
+			const fileArray = [...values.files];
+			await Promise.all(
+				fileArray.map(async (f) => {
+					const b64file = await toBase64(f);
+					uploads.push({
+						filename: f.name,
+						base64: b64file.split(",").pop(),
+						mimetype: f.type,
+					});
+				})
+			);
+		}
+
+		const body = JSON.stringify({
+			name: values.avatarName,
+			discordUsername: values.discordID,
+			description: values.description,
+			files: uploads,
+		});
+
+		console.log(body);
+
+		fetch("https://api.pawlygon.net/commissions/oieeee/application", {
+			method: "POST",
+			body: body,
+			headers: {
+				"Content-type": "application/json; charset=UTF-8",
+			},
+		});
 	}
 
 	const { data } = useSWR("https://api.pawlygon.net/commissions", fetcher);
-	console.log(data);
 
 	return (
 		<>

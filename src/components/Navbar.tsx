@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
 	motion,
@@ -11,6 +11,10 @@ import {
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import useSWR from "swr";
+
+// @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export function NavBar() {
 	const links = ["commissions", "about"];
@@ -31,8 +35,6 @@ export function NavBar() {
 			duration: transitionSpeed,
 			repeat: Infinity,
 		});
-	});
-	useEffect(() => {
 		animate(OuterColor, separatorOuterColors, {
 			ease: "linear",
 			duration: transitionSpeed,
@@ -40,10 +42,23 @@ export function NavBar() {
 		});
 	});
 
+	// Get Commission state from api
+	const [isCommission, setIsCommission] = useState(false);
+	const { data } = useSWR("https://api.pawlygon.net/commissions", fetcher);
+
+	// Update Commission state
+	useEffect(() => {
+		if (data)
+			return data.length === 0 ? setIsCommission(false) : setIsCommission(true);
+	}, [data]);
+
 	return (
 		<nav className="bright top-0 z-50 w-full bg-backgroundBlurred backdrop-blur-lg backdrop-saturate-50">
 			<div className="grid grid-cols-3">
-				<div className="col-span-2 mb-2 mt-4 flex items-center justify-center justify-self-start pl-4 md:col-span-1">
+				<Link
+					href={"/"}
+					className="col-span-2 mb-2 mt-4 flex items-center justify-center justify-self-start pl-4 md:col-span-1"
+				>
 					<Image
 						src="/logo.png"
 						alt="Pawlygon logo"
@@ -54,7 +69,7 @@ export function NavBar() {
 					<h1 className="select-none font-['Coolveltica'] text-3xl font-semibold">
 						Pawlygon
 					</h1>
-				</div>
+				</Link>
 				<div className="hidden items-end justify-center place-self-stretch md:flex">
 					<div>
 						<Link href="/" className={buttonVariants({ variant: "link" })}>
@@ -79,8 +94,37 @@ export function NavBar() {
 				style={{
 					backgroundImage,
 				}}
-				className="h-0.5 w-full"
-			/>
+				variants={{
+					closed: {
+						height: "0.125rem",
+					},
+					open: {
+						height: "2.5rem",
+					},
+				}}
+				initial={"closed"}
+				animate={isCommission ? "open" : "closed"}
+				className="w-full overflow-hidden flex flex-row justify-center"
+			>
+				<div className="mr-auto"></div>
+				<div className="my-auto">
+					<span className="text-center text-black">
+						We are open for commissions! Click{" "}
+						<Link href={"commissions"} className="underline">
+							here
+						</Link>{" "}
+						for more info!
+					</span>
+				</div>
+				<div className="my-auto ml-auto pr-4">
+					<button
+						onClick={() => setIsCommission(false)}
+						className={isCommission ? "visible" : "hidden"}
+					>
+						<span className="text-black">X</span>
+					</button>
+				</div>
+			</motion.div>
 		</nav>
 	);
 }
